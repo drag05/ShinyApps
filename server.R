@@ -23,7 +23,7 @@ shinyServer(
 
   output$shipName <- renderUI(selectInput(inputId = 'shipname'
                                           , label = 'Select Ship Name'
-                                          , choices = selShipnames()[['Shipname']]                                          , multiple = TRUE))
+                                          , choices = selShipnames()[['Shipname']], multiple = TRUE))
 
 
   mapData <- reactive(

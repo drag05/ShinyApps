@@ -1,44 +1,48 @@
 
 shinyUI(
 
-    fluidPage(
+    navbarPage(title = div(img(src = ''
+                         , style = "float:left; padding: 0px 20px; width: 10px")
+                           , style = "color:darkmagenta"
+                           , tags$b("Baltic Sea Naval Traffic"))
+               , position = 'fixed-bottom', collapsible = TRUE
+               , theme = shinythemes::shinytheme('spacelab')
 
-         tags$style(type = 'text/css'
+   , tabPanel('Map',
+
+    fluidPage(suppress_bootstrap = TRUE,
+
+      tags$style(type = 'text/css'
                    , 'html
                    , body {width:100%;height:100%}')
-                , leafletOutput('BalticSea'
-                , width = '75%', height = '500px')
-                , absolutePanel(top = 10, right = 5
-                                , width = '200px'
+                   , leafletOutput('BalticSea'
+                                   , width = '100%', height = '550px')
+                   , absolutePanel(top = 10, right = 5
+                                   , width = '230px'
+
+
+# call UI module data filter
+
+        , selectUI('filter1')
+
+
+                )
+
+         )
+
+     )
 
 
 
-         ,plotOutput(outputId = 'densTBO'
-                       , height = '200px'
-                       , width = '190px'
-                      )
+  , tabPanel('Data',
 
+             fluidPage(
 
-          ,sliderInput(inputId = 'TBO'
-                       , label = c('Mins Btw Observations')
-                       , min = 1.0, max = 6000
-                       , value = range(1.5, 3), step = 0.1
-                       , width = '200px'
-                     )
+    DT::dataTableOutput(outputId = 'tbl', width = "100%", height = "400px")
 
-          ,selectInput(inputId = 'shiptype'
-                        , label = c('Select Ship Type')
-                        , choices = unique(dt[['Ship.type']])
-                        , width = '200px'
-                        , multiple = TRUE
-                     )
+            )
 
-             ,uiOutput(outputId = 'shipName'
-                      , label = c('Select Ship Name')
-                      , width = '200px'
-                     ), tags$br()
-
-          )
+        )
 
    )
 

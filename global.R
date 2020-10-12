@@ -1,10 +1,19 @@
 # libraries
 
-pcks <- pkgs <- c('DT', 'geosphere', 'data.table', 'leaflet', 'ggplot2', 'shiny')
+require(checkmate)
+require(DT)
+require(geosphere)
+require(data.table)
+require(leaflet)
+require(ggplot2)
+require(shiny)
 
+
+# source utility functions and shiny modules
+
+source('./modules/filter.R')
 source('./utils/utilFuns.R')
 
-loadPkg(pkgs)
 
-dt <- readRDS('./data/shinyData.rds')
+dt <- assertDataTable(readRDS('./data/shinyData.rds'))
 

@@ -3,45 +3,49 @@ shinyServer(
 
            function(input, output, session) {
 
-      dt0 <- reactive({
-             dt[Int >= input$TBO[1] & Int < input$TBO[2]]})
 
-      output$densTBO <- renderPlot(
+# call Server module data filter
 
-                       if(nrow(dt0()) == 0) return(NULL) else
+  mapData <- selectServer('filter1')
 
-                ggplot(dt0(), aes(x = Int)) + geom_density(color = 'red')
+# center view coordinates
 
-                 )
+  centerView <- reactive({mapData()[, lapply(.SD, median), .SDcols = c('Lon','Lat')]})
+
+# data table
+
+  output$tbl <- DT::renderDataTable(mapData()
+
+    , server = FALSE
+    , rownames = FALSE
+    , style = 'jqueryui'
+    , extensions = c('Buttons', 'Scroller')
+    , selection = 'multiple'
+    , options = list(columnDefs = list(list(className = 'dt-center', targets = '_all'))
+                     , scrollY = 300
+                     , scrollX = 200
+                     , scroller = TRUE
+                     , deferRender = TRUE
+                     , dom = 'Bfrtip'
+                     , buttons = c('csv'))
+
+                   )
 
 
-  selShipnames <- reactive({
-
-            unique(dt[input$shiptype, on = 'Ship.type'], by = 'Shipname')
-
-                             })
-
-  output$shipName <- renderUI(selectInput(inputId = 'shipname'
-                                          , label = 'Select Ship Name'
-                                          , choices = selShipnames()[['Shipname']], multiple = TRUE))
-
-
-  mapData <- reactive(
-
-    {dt0()[Ship.type %in% input$shiptype & Shipname %in% input$shipname, ]}
-
-                )
-
-   centerView <- reactive(as.data.table(mapData())[, lapply(.SD, median), .SDcols = c('Lon','Lat')])
 
    output$BalticSea <- renderLeaflet(
 
-
-    leaflet(data = mapData()) %>%
+      leaflet(data = mapData()) %>%
       addProviderTiles(group = "Base Map", provider = providers$CartoDB.Positron
                        , options = tileOptions) %>%
-      setView( lng = centerView()$Lon, lat = centerView()$Lat, zoom = 20) %>%
+      setView(lng = centerView()$Lon, lat = centerView()$Lat, zoom = 20) %>%
       clearBounds() %>%
+
+      addCircleMarkers(lng = ~ Lead.lon, lat = ~ Lead.lat
+                       , radius = 2
+                       , fillOpacity = 0.05, group = "Ship's Path"
+                       , color = getColors(mapData()$Is.parked)
+                       , label = ~ Shipname) %>%
 
       addCircleMarkers(lng = ~ Lon, lat = ~ Lat
                        , radius = 2
@@ -50,33 +54,36 @@ shinyServer(
                        , label = ~ Shipname) %>%
 
       addCircleMarkers(lng = ~ mapData()[Idx == 1,]$Lead.lon, lat = ~ mapData()[Idx == 1,]$Lead.lat
-                       , radius = 3
-                       , fillOpacity = 0.3, group = "MaxDBO"
+                       , radius = 4
+                       , fillOpacity = 0.8, weight = 1, group = "MaxDBS"
                        , color = 'red'
-                       , fill = getColors(mapData()[Idx == 1, ]$Is.parked)
-                       , label = ~ paste(Shipname, 'MaxDBO: ', mapData()[Idx == 1,]$Dist, 'meters')
+                       , fill = getColors(mapData()[Idx == 1,]$Is.parked)
+                       , label = ~ paste(mapData()[Idx == 1,]$Shipname, 'MaxDBS: ', mapData()[Idx == 1,]$Dist)
                        ) %>%
 
       addCircleMarkers(lng = ~ mapData()[Idx == 1, ]$Lon, lat = ~ mapData()[Idx == 1, ]$Lat
-                       , radius = 3
-                       , fillOpacity = 0.1, group = "MaxDBO"
-                       , color = "red"
-                       , label = ~ mapData()[Idx == 1,]$Shipname) %>%
+                       , radius = 4
+                       , fillOpacity = 0.1, weight = 1, group = "MaxDBS"
+                       , color = "red", label = ~ mapData()[Idx == 1,]$Shipname
+                       ) %>%
 
-      addLayersControl(baseGroups = c("Base Map"),
-                       overlayGroups = c("Ship's Path","MaxDBO"),
-                       options = layersControlOptions(collapsed = FALSE)) %>%
+      addLayersControl(baseGroups = c("Base Map"), position = 'topleft'
+                       , overlayGroups = c("Ship's Path","MaxDBS")
+                       , options = layersControlOptions(collapsed = FALSE)
+                       ) %>%
 
-      addLegend(position = 'bottomright'
-                , colors = c('orange', 'royalblue'), values = NULL
-                , labels = c(sprintf('Parked, MaxDBO = %s meters'
-                                     , mapData()[Idx == 1 & Is.parked == 1, if(is.na(Dist)) '0' else Dist])
-                             , sprintf('Not Parked, MaxDBO = %s meters'
-                                       , mapData()[Idx == 1 & Is.parked == 0, if(is.na(Dist)) '0' else Dist]))
-                )
+     addLegend(position = 'bottomleft', title = "Max Geodesic Dist Btw Signals", values = NULL
+              , colors = c('red', 'royalblue', 'orange')
+              , labels = c('MaxDBS Markers'
+                           , ifelse(!'royalblue' %in% mapData()$Legend.colors, ''
+                                    , sprintf('Not Parked, MaxDBS = %s meters'
+                                       , mapData()[Legend.colors %in% 'royalblue' & Idx %in% 1, max(Dist)]))
+                           , ifelse(!'orange' %in% mapData()$Legend.colors, ''
+                                    , sprintf('Parked, MaxDBS = %s meters'
+                                       , mapData()[Legend.colors %in% 'orange' & Idx %in% 1, max(Dist)])))
 
+                                )
 
-       )
+                     )
 
-
-})
+           })

@@ -7,26 +7,36 @@ loadPkg <- function(x) {
 
          if (!is.null(miss)) install.packages(miss, quietly = TRUE)
 
-              
+
          lapply(x, require, character.only = TRUE)
 
 }
 
 # other custom functions
 
-# 2. edit column names 
+# 2. edit column names (very inefficient!)
 
-fancyCols <- function(data) {tools::toTitleCase(
-                                         
-                                   tolower(names(data)
-               
-                                         )
-                                 ) %>% 
+fancyCols <- function(x) {
 
-                      gsub('_', '.', .)
+require(magrittr)
+
+  tools::toTitleCase(
+
+                     tolower(x)
+
+                ) %>% gsub('_', '.', .)
 
              }
+
 
 # 3. change color by parking status
 
 getColors <- function(x) {ifelse(x == 0, 'royalblue', 'orange')}
+
+# 4. add legend colors to data file
+
+addLegendColors = function(x) {
+
+        fifelse(x == 0, 'royalblue', 'orange')
+}
+

@@ -7,7 +7,7 @@ require(data.table)
 require(leaflet)
 require(ggplot2)
 require(shiny)
-
+require(shinyjs)
 
 # source utility functions and shiny modules
 

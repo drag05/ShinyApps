@@ -2,7 +2,10 @@
 shinyServer(
 
            function(input, output, session) {
+                      
+# cached plots directory
 
+shinyOptions(cache = diskCache(file.path('./cache')))
 
 # call Server module data filter
 

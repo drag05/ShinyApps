@@ -62,6 +62,8 @@ selectUI <- function(id) {
                  theme(axis.text.y = element_text(angle = 20)) +
                  xlab('Day Of Week') + ylab('Total Covered Distance (meters)') +
                  facet_wrap(~ Ship.type)
+                 
+          , cacheKeyExpr = { list(input$drang[1], input$drang[2]) }
 
              )
 

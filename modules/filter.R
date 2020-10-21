@@ -6,7 +6,7 @@ selectUI <- function(id) {
 
      dateRangeInput(NS(id, 'drang'), 'Select Date Range'
                     , start = median(dt$Date)
-                    , end = max(dt$Date)
+                    , end = median(dt$Date) + 2L
                     , min = min(dt$Date)
                     , max = max(dt$Date)
                     , width = '230px'
@@ -20,7 +20,7 @@ selectUI <- function(id) {
       , selectInput(NS(id, 'shiptype')
                         , label = c('Select Ship Type')
                         , choices = unique(dt[['Ship.type']])
-                        , width = '200px', size = 3
+                        , size = 3
                         , multiple = FALSE
                         , selectize = FALSE
                        )
@@ -29,7 +29,7 @@ selectUI <- function(id) {
                       , label = c('Select Ship Name')
                       , width = '200px'
                       , selectize = FALSE
-                     )
+                     ), tags$br()
 
           )
 
@@ -53,7 +53,7 @@ selectUI <- function(id) {
              })
 
 
-                output$densTBO <- renderPlot(
+                output$densTBO <- renderCachedPlot(
 
           ggplot(dt0(), aes(x = Date, y = Dist)) +
                  geom_point(color = 'green', fill = 'green') + theme_bw() +
@@ -62,10 +62,10 @@ selectUI <- function(id) {
                  theme(axis.text.y = element_text(angle = 20)) +
                  xlab('Day Of Week') + ylab('Total Covered Distance (meters)') +
                  facet_wrap(~ Ship.type)
-                 
+
           , cacheKeyExpr = { list(input$drang[1], input$drang[2]) }
 
-             )
+          )
 
 
         selShipnames <- reactive({
@@ -85,7 +85,9 @@ selectUI <- function(id) {
                                             selectInput(ns('shipname')
                                            , label = 'Select Ship Name'
                                            , choices = selShipnames()[['Shipname']]
-                                           , multiple = TRUE)
+                                           , multiple = TRUE
+                                           , selectize = FALSE
+                                           , size = 3)
 
                                        })
 
@@ -94,7 +96,7 @@ selectUI <- function(id) {
 
         dt0()[Ship.type %in% input$shiptype & Shipname %in% input$shipname,]
 
-                              })
+                    })
 
                        )
 

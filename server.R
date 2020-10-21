@@ -26,7 +26,7 @@ shinyOptions(cache = diskCache(file.path('./cache')))
     , selection = 'multiple'
     , options = list(columnDefs = list(list(className = 'dt-center', targets = '_all'))
                      , scrollY = 300
-                     , scrollX = 200
+                    #, scrollX = 200
                      , scroller = TRUE
                      , deferRender = TRUE
                      , dom = 'Bfrtip'

@@ -2,7 +2,7 @@
 shinyServer(
 
            function(input, output, session) {
-                      
+
 # cached plots directory
 
 shinyOptions(cache = diskCache(file.path('./cache')))
@@ -11,14 +11,15 @@ shinyOptions(cache = diskCache(file.path('./cache')))
 
   mapData <- selectServer('filter1')
 
+
 # center view coordinates
 
   centerView <- reactive({mapData()[, lapply(.SD, median), .SDcols = c('Lon','Lat')]})
 
 # data table
 
-  output$tbl <- DT::renderDataTable(mapData()
 
+  output$tbl <- renderDataTable(mapData()[, c(1:2, 5, 7, 9:10, 12:14, 20) := NULL]
     , server = FALSE
     , rownames = FALSE
     , style = 'jqueryui'
@@ -26,7 +27,7 @@ shinyOptions(cache = diskCache(file.path('./cache')))
     , selection = 'multiple'
     , options = list(columnDefs = list(list(className = 'dt-center', targets = '_all'))
                      , scrollY = 300
-                    #, scrollX = 200
+                     #, scrollX = 200
                      , scroller = TRUE
                      , deferRender = TRUE
                      , dom = 'Bfrtip'
@@ -38,6 +39,7 @@ shinyOptions(cache = diskCache(file.path('./cache')))
 
    output$BalticSea <- renderLeaflet(
 
+
       leaflet(data = mapData()) %>%
       addProviderTiles(group = "Base Map", provider = providers$CartoDB.Positron
                        , options = tileOptions) %>%
@@ -47,13 +49,13 @@ shinyOptions(cache = diskCache(file.path('./cache')))
       addCircleMarkers(lng = ~ Lead.lon, lat = ~ Lead.lat
                        , radius = 2
                        , fillOpacity = 0.05, group = "Ship's Path"
-                       , color = getColors(mapData()$Is.parked)
+                       , color = ~ getColors(Is.parked)
                        , label = ~ Shipname) %>%
 
       addCircleMarkers(lng = ~ Lon, lat = ~ Lat
                        , radius = 2
                        , fillOpacity = 0.05, group = "Ship's Path"
-                       , color = getColors(mapData()$Is.parked)
+                       , color = ~ getColors(Is.parked)
                        , label = ~ Shipname) %>%
 
       addCircleMarkers(lng = ~ mapData()[Idx == 1,]$Lead.lon, lat = ~ mapData()[Idx == 1,]$Lead.lat
@@ -61,7 +63,7 @@ shinyOptions(cache = diskCache(file.path('./cache')))
                        , fillOpacity = 0.8, weight = 1, group = "MaxDBS"
                        , color = 'red'
                        , fill = getColors(mapData()[Idx == 1,]$Is.parked)
-                       , label = ~ paste(mapData()[Idx == 1,]$Shipname, 'MaxDBS: ', mapData()[Idx == 1,]$Dist)
+                       , label = ~ paste(mapData()[Idx == 1]$Shipname, 'MaxDBS: ', mapData()[Idx == 1]$Dist)
                        ) %>%
 
       addCircleMarkers(lng = ~ mapData()[Idx == 1, ]$Lon, lat = ~ mapData()[Idx == 1, ]$Lat
@@ -80,12 +82,12 @@ shinyOptions(cache = diskCache(file.path('./cache')))
               , labels = c('MaxDBS Markers'
                            , ifelse(!'royalblue' %chin% mapData()$Legend.colors, ''
                                     , sprintf('Not Parked, MaxDBS = %s meters'
-                                       , mapData()[Legend.colors %chin% 'royalblue' & Idx %in% 1, max(Dist)]))
+                                       , mapData()[Legend.colors %chin% 'royalblue' & Idx %in% 1, Dist]))
                            , ifelse(!'orange' %chin% mapData()$Legend.colors, ''
                                     , sprintf('Parked, MaxDBS = %s meters'
-                                       , mapData()[Legend.colors %chin% 'orange' & Idx %in% 1, max(Dist)])))
+                                       , mapData()[Legend.colors %chin% 'orange' & Idx %in% 1, Dist])))
 
-                                )
+                               )
 
                      )
 

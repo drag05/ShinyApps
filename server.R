@@ -78,12 +78,12 @@ shinyOptions(cache = diskCache(file.path('./cache')))
      addLegend(position = 'bottomleft', title = "Max Geodesic Dist Btw Signals", values = NULL
               , colors = c('red', 'royalblue', 'orange')
               , labels = c('MaxDBS Markers'
-                           , ifelse(!'royalblue' %in% mapData()$Legend.colors, ''
+                           , ifelse(!'royalblue' %chin% mapData()$Legend.colors, ''
                                     , sprintf('Not Parked, MaxDBS = %s meters'
-                                       , mapData()[Legend.colors %in% 'royalblue' & Idx %in% 1, max(Dist)]))
-                           , ifelse(!'orange' %in% mapData()$Legend.colors, ''
+                                       , mapData()[Legend.colors %chin% 'royalblue' & Idx %in% 1, max(Dist)]))
+                           , ifelse(!'orange' %chin% mapData()$Legend.colors, ''
                                     , sprintf('Parked, MaxDBS = %s meters'
-                                       , mapData()[Legend.colors %in% 'orange' & Idx %in% 1, max(Dist)])))
+                                       , mapData()[Legend.colors %chin% 'orange' & Idx %in% 1, max(Dist)])))
 
                                 )
 

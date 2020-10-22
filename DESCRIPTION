@@ -1,6 +1,6 @@
 Shiny App:
 Date: 2020-10-10
-Title: Naval Shipment in the Baltic Sea
+Title: Naval Traffic in the Baltic Sea
 Author@R: c(person('Dragos Bandur', 'Developer', role = c('dev'),
             email = 'dbandur@sympatico.ca')
 Description: A shiny app 

@@ -74,7 +74,7 @@ selectUI <- function(id) {
         unique(dt0()[between(Date,
                              lower = input$drang[1]
                              , upper = input$drang[2], NAbounds = NA)
-                     ][Ship.type %in% input$shiptype], by = 'Shipname')
+                     ][Ship.type %chin% input$shiptype], by = 'Shipname')
 
                         })
 
@@ -94,7 +94,7 @@ selectUI <- function(id) {
 
           return(reactive({
 
-        dt0()[Ship.type %in% input$shiptype & Shipname %in% input$shipname,]
+        dt0()[Ship.type %chin% input$shiptype & Shipname %chin% input$shipname,]
 
                     })
 

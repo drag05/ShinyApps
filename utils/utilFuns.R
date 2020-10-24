@@ -1,5 +1,5 @@
 
-# 1. load packages as character vector
+# 1. load packages as character vector (doesn't work for leaflet package)
 
 loadPkg <- function(x) {
 
@@ -14,7 +14,7 @@ loadPkg <- function(x) {
 
 # other custom functions
 
-# 2. edit column names (very inefficient!)
+# 2. edit column names (very slow, needs cpp extension)
 
 fancyCols <- function(x) {
 

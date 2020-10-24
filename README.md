@@ -8,3 +8,4 @@ Where present, the red dots locate the end-points of MaxDBS path segment for res
 Multiple paths (hence, multipls MaxDBSs), corresponding to the same ship are possible when a range of dates is selected.
 The facetted plot on the right side of the map depicts the total distance (in meters) covered in any day of the week by each ship type. Some date ranges were cached to disk for faster processing of the plot.
 Information filtered by dates, ship type and ship name is collected in the "Data" table which can be downloaded as `csv` file.
+Interact with the app at https://drago56.shinyapps.io/BalticSeaModules

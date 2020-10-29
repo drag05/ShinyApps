@@ -13,8 +13,8 @@ selectUI <- function(id) {
                    )
 
       , plotOutput(NS(id, 'densTBO')
-                    , height = '230px'
-                    , width = '230px'
+                    , height = '200px'
+                    , width = '200px'
                     )
 
       , selectInput(NS(id, 'shiptype')
@@ -39,6 +39,7 @@ selectUI <- function(id) {
 
    selectServer <- function(id) {
 
+
       moduleServer(id,
 
            function(input, output, session) {
@@ -53,19 +54,21 @@ selectUI <- function(id) {
              })
 
 
-                output$densTBO <- renderCachedPlot(
+          output$densTBO <- renderCachedPlot({
 
-          ggplot(dt0(), aes(x = Date, y = Dist)) +
-                 geom_point(color = 'green', fill = 'green') + theme_bw() +
-                 scale_x_date('Day', date_labels = '%a', minor_breaks = NULL) +
-                 theme(axis.text.x = element_text(angle = 90)) +
-                 theme(axis.text.y = element_text(angle = 20)) +
-                 xlab('Day Of Week') + ylab('Total Covered Distance (meters)') +
-                 facet_wrap(~ Ship.type)
+                  ggplot(dt0()[,.(Date, Dist, Ship.type)], aes(x = Date, y = Dist %/% 1e3L)) +
+                    geom_point(color = 'green', fill = 'green') + theme_bw() +
+                    scale_x_date('Day', date_labels = '%a', minor_breaks = NULL) +
+                    theme(axis.text.x = element_text(angle = 90)) +
+                    theme(axis.text.y = element_text(angle = 20)) +
+                    xlab('Day Of Week') + ylab('Total Covered Distance (Km)') +
+                    facet_wrap(~ Ship.type)
 
-          , cacheKeyExpr = { list(input$drang[1], input$drang[2]) }
+                                        }
 
-          )
+                , cacheKeyExpr = { list(input$drang[1], input$drang[2]) }
+
+                       )
 
 
         selShipnames <- reactive({
@@ -74,6 +77,8 @@ selectUI <- function(id) {
         unique(dt0()[between(Date,
                              lower = input$drang[1]
                              , upper = input$drang[2], NAbounds = NA)
+                     , .(Date, Ship.type, Shipname)
+
                      ][Ship.type %chin% input$shiptype], by = 'Shipname')
 
                         })

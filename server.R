@@ -3,21 +3,41 @@ shinyServer(
 
            function(input, output, session) {
 
+
 # cached plots directory
 
 shinyOptions(cache = diskCache(file.path('./cache')))
 
-# call Server module data filter
+# call server data
 
-  mapData <- selectServer('filter1')
+
+    dt0 <- dataServer('data')
+
+
+stopifnot(is.reactive(dt0))
+
+# call Server module for plots
+
+#plan(multisession)
+
+graphServer('plot1', data = dt0)
+
+#plan(sequential)
+
+
+# call Server filter module for data
+
+ mapData <- selectServer('filter1', data = dt0)
+
+ stopifnot(is.reactive(mapData))
 
 
 # center view coordinates
 
   centerView <- reactive({mapData()[, lapply(.SD, median), .SDcols = c('Lon','Lat')]})
 
-# data table
 
+# the data table tab
 
   output$tbl <- renderDataTable(mapData()[, c(1:2, 5, 7, 9:10, 12:14, 20) := NULL]
     , server = FALSE
@@ -35,7 +55,7 @@ shinyOptions(cache = diskCache(file.path('./cache')))
 
                    )
 
-
+# the map tab
 
    output$BalticSea <- renderLeaflet(
 
@@ -46,11 +66,12 @@ shinyOptions(cache = diskCache(file.path('./cache')))
       setView(lng = centerView()$Lon, lat = centerView()$Lat, zoom = 20) %>%
       clearBounds() %>%
 
+## is this first set of markers really needed?
       addCircleMarkers(lng = ~ Lead.lon, lat = ~ Lead.lat
-                       , radius = 2
-                       , fillOpacity = 0.05, group = "Ship's Path"
-                       , color = ~ getColors(Is.parked)
-                       , label = ~ Shipname) %>%
+                      , radius = 2
+                     , fillOpacity = 0.05, group = "Ship's Path"
+                      , color = ~ getColors(Is.parked)
+                     , label = ~ Shipname) %>%
 
       addCircleMarkers(lng = ~ Lon, lat = ~ Lat
                        , radius = 2

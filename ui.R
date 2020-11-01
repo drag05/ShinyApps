@@ -11,6 +11,7 @@ shinyUI(
                , position = 'fixed-bottom', collapsible = TRUE
                , theme = shinythemes::shinytheme('lumen')
 
+
    , tabPanel('Map',
 
     fluidPage(#suppress_bootstrap = TRUE,
@@ -25,28 +26,36 @@ shinyUI(
                    , absolutePanel(top = 10, right = 5
                                    , width = '230px'
 
+# call UI module for data which only shows the date range
+
+        , dataUI('data')
+
+# call UI module for plots
+
+        , graphUI('plot1')
 
 # call UI module data filter
 
         , selectUI('filter1')
 
 
+
                 )
 
-         )
+          )
 
      )
 
+ # the data table tab
 
+              , tabPanel('Data',
 
-  , tabPanel('Data',
+                     DT::dataTableOutput(outputId = 'tbl', height = "auto")
 
-        DT::dataTableOutput(outputId = 'tbl', height = "auto")
+                   )
 
-        )
+            )
 
-   )
-
-  )
+     )
 
 )
